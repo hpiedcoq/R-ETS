@@ -4,6 +4,7 @@ library('XML')
 library('rvest')
 library(stringr)
 library('reshape2')
+library('data.table')
 ###1st part the first dataframe
 #Define starting URL for ETS
 urlDepart <- 'http://ec.europa.eu/environment/ets/oha.do?form=oha&languageCode=en&account.registryCodes=AT&account.registryCodes=BE&account.registryCodes=BG&account.registryCodes=HR&account.registryCodes=CY&account.registryCodes=CZ&account.registryCodes=DK&account.registryCodes=EE&account.registryCodes=EU&account.registryCodes=FI&account.registryCodes=FR&account.registryCodes=DE&account.registryCodes=GR&account.registryCodes=HU&account.registryCodes=IS&account.registryCodes=IE&account.registryCodes=IT&account.registryCodes=LV&account.registryCodes=LI&account.registryCodes=LT&account.registryCodes=LU&account.registryCodes=MT&account.registryCodes=NL&account.registryCodes=NO&account.registryCodes=PL&account.registryCodes=PT&account.registryCodes=RO&account.registryCodes=SK&account.registryCodes=SI&account.registryCodes=ES&account.registryCodes=SE&account.registryCodes=GB&accountHolder=&installationIdentifier=&installationName=&permitIdentifier=&mainActivityType=-1&account.complianceStatusArray=0&account.complianceStatusArray=-&account.complianceStatusArray=A&account.complianceStatusArray=B&account.complianceStatusArray=C&account.complianceStatusArray=D&account.complianceStatusArray=E&account.complianceStatusArray=X&search=Search&searchType=oha&currentSortSettings='
@@ -95,6 +96,7 @@ b <- as.numeric(lengths(listLinksDef[1]))
 #Create inital DF with 1st values
 urlActeur <- listLinksDef[a,11]
 page <- read_html(urlActeur)
+Sys.sleep(runif(1, 1.5, 2))
 xpathVar <- '//*[(@id = "tblChildDetails")]'
 #Collecting structure data. In order to keep the row title we split it in two phases
 tableGen <<- page %>%
@@ -142,6 +144,7 @@ a <- a + 1
 while (b > a){
   urlActeur <- listLinksDef[a,11]
   page <- read_html(urlActeur)
+  Sys.sleep(runif(1, 1.5, 2))
   xpathVar <- '//*[(@id = "tblChildDetails")]'
   #Collecting structure data. In order to keep the row title we split it in two phases
   tableGen <<- page %>%
@@ -183,10 +186,11 @@ while (b > a){
   tableGen1 <- tableGen1[-1,]
   #Merging these two dataframe
   tablegen <- cbind(tableGen, tableGen1)
-  ListLinks2 <- cbind(ListLinks[a,],tablegen)
-  finalDF <- rbind(finalDF,ListLinks2)
+  ListLinks2 <-cbind(ListLinks[a,],tablegen)
+  ListLinks2 <- unlist(ListLinks2[1,], use.names=FALSE) #Sometimes column names differs slightly so I had to bypass this error by removing them
+  finalDF <- rbind(finalDF, ListLinks2)
   a <- a + 1
 }
-write.csv(finaldf, file = "finalDF.csv")
+write.csv(finalDF, file = "finalDF.csv")
 rm(page, tableAdd, tableAdd2, tablegen, tableGen1, tableGen)
 #end! Good work!!!
