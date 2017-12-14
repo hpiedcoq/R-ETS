@@ -141,7 +141,7 @@ tablegen <- cbind(tableGen, tableGen1)
 finalDF <- cbind(ListLinks[a,],tablegen)
 a <- a + 1
 #Let'sloop
-while (b > a){
+while (b > (a)){
   urlActeur <- listLinksDef[a,11]
   page <- read_html(urlActeur)
   Sys.sleep(runif(1, 1.5, 2))
